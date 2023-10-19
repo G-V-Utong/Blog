@@ -1,0 +1,42 @@
+<div class="author">
+    <h1 class="author_heading">Welcome to Bloggo</h1>
+    <p class="author_body">Where Ideas Blossom and Stories Shine. 📝✨</p>
+</div>
+
+<div class="slider_container">
+    <div class="slider_wrapper">
+        <img src="/images/ink-pen-3958737_1280.jpg" alt="pen" class="hero-image" width="981" height="528">
+        <img src="/images/write-5243230_1280.jpg" alt="pen" class="hero-image" width="981" height="528">
+        <img src="/images/business-2651346_1280.jpg" alt="pen" class="hero-image" width="981" height="528">
+        <img src="/images/social-1148035_1280.jpg" alt="pen" class="hero-image" width="981" height="528">
+        <img src="/images/typewriter-1227357_1280.jpg" alt="pen" class="hero-image" width="981" height="528">
+        
+    </div>
+</div>
+
+<section class="articles">
+    <h2 class="articles_heading">Latest Posts</h2>
+
+    <ul class="article-ul">
+        <% data.forEach(post => { %>
+            <li>
+                <a href="/post/<%= post._id%>">
+                    <span><%= post.title %></span>
+                    <span class="article-list_date"><%= post.createdAt.toDateString() %></span>
+                </a>
+            </li>
+        <% }) %>
+        
+    </ul>
+
+   <div class="pagination_container">
+    
+    <% if (nextPage !== null) { %>
+        <a href="/?page=<%= nextPage %>" class="pagination">&lt; View Older Posts</a>
+    <% } %>
+    <% if (prevPage >= 1 && prevPage !== null) { %>
+        <a href="/?page=<%= prevPage %>" class="pagination_next"> View Newer Posts &gt;</a>
+    <% } %>
+    
+   </div>
+</section>

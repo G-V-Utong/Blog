@@ -4,13 +4,13 @@ const Schema = mongoose.Schema;
 
 const PostSchema = Schema({
     title:{
-        type: {String},
+        type: String,
         required: true,
         unique: true
     },
 
     body: {
-        type: {String},
+        type: String,
         required: true,
     },
 

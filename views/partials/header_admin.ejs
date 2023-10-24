@@ -1,0 +1,21 @@
+<header class="header">
+    <a href="/" class="header_logo"><img src="/images/bloggo_logo.PNG" alt="logo" width="50" height="10"></a>
+    <nav class="header_nav">
+        <ul>
+            <li>
+                <a href="/" class="<%= isActiveRoute('/', currentRoute) %>">Home</a>
+            </li>
+            <li>
+                <a href="/drafts" class="<%= isActiveRoute('/drafts', currentRoute) %>">Drafts</a>
+            </li>
+            <li>
+                <a href="/published" class="<%= isActiveRoute('/published', currentRoute) %>">Published Posts</a>
+            </li>
+        </ul>
+    </nav>
+    <div class="header_button">
+        <a href="/logout" class="loginBtn">
+            Logout
+        </a>
+    </div>
+</header>

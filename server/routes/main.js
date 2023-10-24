@@ -37,7 +37,7 @@ router.get('', async (req, res) => {
         current: page,
         nextPage: hasNextPage ? nextPage : null,
         prevPage: hasPrevPage ? prevPage : null,
-        // currentRoute: '/'
+        currentRoute: '/'
         });
     } catch (error) {
         console.log(error);
@@ -56,7 +56,7 @@ router.get('/post/:id', async (req, res) => {
         const locals = {
             title: data.title,
         }
-        res.render('post', {locals, data});
+        res.render('post', {locals, data, currentRoute: `/posts/${slug}`});
     }catch(error) {
         console.log(error);
     }
@@ -75,8 +75,8 @@ router.post('/search', async (req, res) => {
         const searchNoSpecialChar = searchTerm.replace(/[^a-zA-Z0-9 ]/g, "");
         const data = await Post.find({
             $or: [
-                { title: { searchNoSpecialChar } },
-                { body: { regex: new RegExp(searchNoSpecialChar, 'i')} }
+                { title: new RegExp(searchNoSpecialChar, 'i')},
+                { body: new RegExp(searchNoSpecialChar, 'i') }
             ]
             });
         
@@ -92,7 +92,15 @@ router.post('/search', async (req, res) => {
 
 router.get('/about', (req, res) => {
 
-    res.render('about');
+    res.render('about', {
+        currentRoute: '/about'
+    });
 });
 
+router.get('/contact', (req, res) => {
+
+    res.render('contact', {
+        currentRoute: '/contact'
+    });
+})
 module.exports = router;

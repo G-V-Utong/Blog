@@ -1,4 +1,22 @@
 <h1><%= data.title %></h1>
+<h3 class="description"><%= data.description %></h3>
+<div class="author-container">
+    <p><%= data.author %></p>
+    <div class="read-time-container">
+        <p><%= Math.floor(data.reading_time) %> min read   •  <% if (Date.now() - data.createdAt < 60000) { %>
+            <p>  1 min ago</p>
+           <%  } else if (Date.now() - data.createdAt < 3600000) {%> <p> <%= Math.floor(((Date.now() - data.createdAt) / 60000)) %> min ago •</p>
+               <% } else if (Date.now() - data.createdAt < 86400000) {%> <p> <%= Math.floor(((Date.now() - data.createdAt) / 3600000)) %> hours ago •</p>
+                <% } else if (Date.now() - data.createdAt < 604800000) {%> <p> <%= Math.floor(((Date.now() - data.createdAt) / 86400000)) %> days ago •</p>
+                   <% } else { %> <p><%= data.createdAt.toDateString %> •</p>
+                       <% } %></p>
+                       <i class="fa fa-eye"></i><p><%= data.read_count %></p> 
+    </div>
+</div>
 <article class="article">
     <%= data.body  %>
 </article>
+
+<div class="tags">
+    <p><b> Tags</b>: <%= data.tags %></p>
+</div>

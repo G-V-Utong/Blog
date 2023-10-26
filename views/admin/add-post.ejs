@@ -3,14 +3,60 @@
   <h2>Add New Post</h2>
 </div>
 
-<form action="/add-post" method="POST">
+<form action="/add-post" method="POST" id="post-form">
 
   <label for="title"><b>Title</b></label>
-  <input type="text" placeholder="Post Title" name="title">
+  <input type="text" placeholder="Post Title" name="title" required>
+
+  <label for="author"><b>Author</b></label>
+  <input type="text" placeholder="Post Author" name="author">
+
+  <label for="description"><b>Description</b></label>
+  <input type="text" placeholder="Post Description" name="description">
+
+  <label for="tags"><b>Tags</b></label>
+  <input type="text" placeholder="Type tags, seperated by commas" name="tags">
 
   <label for="body"><b>Content</b></label>
-  <textarea name="body" cols="50" rows="10"></textarea>
+  <textarea name="body" cols="50" rows="10" required></textarea>
 
-  <input type="submit" value="Add" class="btn">
+  <div>
+    <input type="submit" value="Save to drafts" class="btn" id="save-to-drafts">
+    <input type="submit" value="Publish" class="btn-publish btnP" id="publish">
+
+    <input type="hidden" name="action" id="action" value=""> <!-- Hidden input to store the action -->
+  </div>
+
+  <script>
+    // JavaScript to handle form submission based on the button clicked
+    document.getElementById("save-to-drafts").addEventListener("click", function() {
+      document.getElementById("action").value = "draft"; // Set the action to "draft"
+      document.getElementById("post-form").submit(); // Submit the form
+    });
+
+    document.getElementById("publish").addEventListener("click", function() {
+      document.getElementById("action").value = "publish"; // Sets the action to "publish"
+      document.getElementById("post-form").submit(); // Submits the form
+    });
+  </script>
 
 </form>
+
+<!-- <form action="/publish-post" method="POST">
+  <label for="title"><b>Title</b></label>
+  <input type="text" placeholder="Post Title" name="title" required>
+
+  <label for="author"><b>Author</b></label>
+  <input type="text" placeholder="Post Author" name="author">
+
+  <label for="description"><b>Description</b></label>
+  <input type="text" placeholder="Post Description" name="description">
+
+  <label for="tags"><b>Tags</b></label>
+  <input type="text" placeholder="Type tags, seperated by commas" name="tags">
+
+  <label for="body"><b>Content</b></label>
+  <textarea name="body" cols="50" rows="10" required></textarea>
+
+  <input type="submit" value="Publish" class="btn-publish btnP">
+</form> -->

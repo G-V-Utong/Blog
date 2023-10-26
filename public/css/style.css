@@ -5,6 +5,7 @@
   --gray: #7E7E7E;
   --gray-light: #E4E4E4;
   --red: #b30000;
+  --green: #078917;
   --font-size-base: 1rem;
   --font-size-md: clamp(1.25rem, 0.61vw + 1.1rem, 1.58rem);
   --font-size-lg: clamp(1.56rem, 1vw + 1.31rem, 2.11rem);
@@ -22,9 +23,9 @@ body {
 }
 
 a { color: var(--black); }
-h1 { font-size: var(--font-size-xl); }
+h1 { font-size: var(--font-size-xl); margin-bottom: 0}
 h2 { font-size: var(--font-size-lg); }
-h3 { font-size: var(--font-size-md); }
+h3 { font-size: var(--font-size-md); margin: 0 }
 
 input[type="text"],
 input[type="email"],
@@ -56,6 +57,20 @@ textarea {
   background-color: var(--red);
 }
 
+.btn-publish {
+  padding: 10px 16px;
+  background-color: var(--green);
+}
+
+.btnP {
+  background-color: var(--green);
+  border: none;
+  color: white; 
+  padding: 16px 32px;
+  text-decoration: none;
+  margin: 4px 2px; 
+  cursor: pointer;
+}
 
 img {
   width: 100%;
@@ -348,6 +363,11 @@ img {
   margin: 0;
 }
 
+.admin-post-controls {
+  display: flex;
+  flex-direction: row;
+}
+
 .admin-post-controls form {
   display: inline-block;
 }
@@ -361,8 +381,17 @@ img {
   font-size: .8rem;
   padding: 4px 8px;
   line-height: 2;
+  
 }
 
+.admin-post-controls > p {
+  font-size: x-small;
+  margin-right: 10px;
+}
+
+.admin-post-controls-dashboard{
+  font-weight: normal;
+}
 .admin-posts li {
   display: flex;
   justify-content: space-between;
@@ -422,4 +451,37 @@ img {
 
 .pagination:hover {
   color: var(--black);
+}
+
+.description{
+  color: #646464;
+  font-weight: normal;
+}
+
+.read-time-container {
+  display: flex;
+}
+
+.read-time-container p {
+  margin-right: 5px;
+  color: #8a8a8a;
+  margin-top: 0;
+  font-size: small;
+}
+
+.read-time-container i {
+  margin-right: 5px;
+  color: #8a8a8a;
+  margin-top: 0;
+  
+}
+
+.tags{
+  font-style: italic;
+}
+
+.noPostMessage{
+  display: flex;
+  justify-content: center;
+  font-size: small;
 }

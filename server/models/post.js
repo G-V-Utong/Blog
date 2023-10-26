@@ -19,17 +19,26 @@ const PostSchema = Schema({
     },
 
     author:{
-        type: String,
+        type: mongoose.Schema.Types.Mixed,
     },
 
     state:{
         type: String,
-        value: ["draft", "published"], 
+        enum: ["draft", "published"], 
         default:"draft"
     },
 
     read_count:{
         type: Number,
+    },
+
+    read_count: {
+        type: Number,
+        default: 0 
+    },
+
+    last_read_at: {
+        type: Date
     },
 
     reading_time:{

@@ -1,4 +1,4 @@
-<a href="/dashboard">&larr; Back</a>
+<a href="/admin/dashboard">&larr; Back</a>
 <div class="admin-title">
   <h2>View / Edit Post</h2>
 
@@ -13,9 +13,35 @@
   <label for="title"><b>Title</b></label>
   <input type="text" placeholder="Post Title" name="title" value="<%= data.title %>">
 
+  <label for="description"><b>Description</b></label>
+  <input type="text" placeholder="Post Description" name="description" value="<%= data.description %>">
+
+  <label for="tags"><b>Tags</b></label>
+  <input type="text" placeholder="Type tags, seperated by commas" name="tags" value="<%= data.tags %>">
+
+  
   <label for="body"><b>Content</b></label>
   <textarea name="body" cols="50" rows="10"><%= data.body %></textarea>
 
-  <input type="submit" value="Update" class="btn">
+  <!-- <input type="submit" value="Update" class="btn"> -->
+  <div>
+    <input type="submit" value="Update & Save" class="btn" id="save-to-drafts">
+    <input type="submit" value="Publish Post" class="btn-publish btnP" id="publish">
+
+    <input type="hidden" name="action" id="action" value=""> <!-- Hidden input to store the action -->
+  </div>
+
+  <script>
+    // JavaScript to handle form submission based on the button clicked
+    document.getElementById("save-to-drafts").addEventListener("click", function() {
+      document.getElementById("action").value = "draft"; // Set the action to "draft"
+      document.getElementById("post-form").submit(); // Submit the form
+    });
+
+    document.getElementById("publish").addEventListener("click", function() {
+      document.getElementById("action").value = "publish"; // Sets the action to "publish"
+      document.getElementById("post-form").submit(); // Submits the form
+    });
+  </script>
 
 </form>

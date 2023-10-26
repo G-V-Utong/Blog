@@ -1,26 +1,48 @@
 <div class="admin-title">
-    <h2>Posts</h2>
+    <h2>Your Post History</h2>
     <a href="/add-post" class="button">+ Add New</a>
   </div>
   
-  <ul class="admin-posts">
+  <% if (data.length === 0) { %>
+    <div class="noPostMessage">
+      <p>Welcome to your dashboard. Your drafts and published posts will be displayed here</p>
+    </div>
+   
+  <% } else { %> 
+    <ul class="admin-posts">
   
-    <% data.forEach(post => { %>
-     
-      <li>
-        <a href="/post/<%= post._id %>">
-          <%= post.title %> &nearr;
-        </a>
-        <div class="admin-post-controls">
-          <a href="/edit-post/<%= post._id %>" class="btn">Edit</a>
+      <% data.forEach(post => { %>
+       
+        <li>
+          <a href="/post/<%= post._id %>">
+            <%= post.title %> &nearr;
+          </a>
+          <div class="admin-post-controls-dashboard">
+            <p>
+              <%= (post.state.charAt(0).toUpperCase() + post.state.slice(1) )%>
+              <% if (post.state === 'published') { %>
+                <i class="fa fa-check" aria-hidden="true"></i>
+              <% } else { %>
+                <i class="fa fa-pencil" aria-hidden="true"></i>
+              <% } %>
+               
+            </p>
+            <!-- <a href="/edit-post/<%= post._id %>" class="btn">Edit</a>
+            
+            <form action="/publish-post/<%= post._id %>?_method=PUT" method="POST">
+              <input type="submit" value="Publish" class="btn-publish btn">
+            </form>
+    
+            <form action="/delete-post/<%= post._id %>?_method=DELETE" method="POST">
+              <input type="submit" value="Delete" class="btn-delete btn">
+            </form> -->
+    
+          </div>
+    
+        </li>
+    
+      <% }) %>
+    </ul>
+  <% } %>
+   
   
-          <form action="/delete-post/<%= post._id %>?_method=DELETE" method="POST">
-            <input type="submit" value="Delete" class="btn-delete btn">
-          </form>
-  
-        </div>
-  
-      </li>
-  
-    <% }) %>
-  </ul>

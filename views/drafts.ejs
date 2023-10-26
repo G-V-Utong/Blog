@@ -1,0 +1,35 @@
+<div class="admin-title">
+    <h2>Your Drafts</h2>
+    <a href="/add-post" class="button">+ Add New</a>
+</div>
+  
+<section class="articles">
+    <% if (data.length === 0) { %>
+        <div class="noPostMessage">
+            <p>Clean as a whistle, boss! Lets start by adding some posts in here. Click on the 'Add New' Button above to get going.</p>
+        </div>
+       <% } else { %> 
+        <ul class="admin-posts">
+  
+            <% data.forEach(post => { %>
+             
+              <li>
+                <a href="/post/<%= post._id %>">
+                  <%= post.title %> &nearr;
+                </a>
+                <div class="admin-post-controls">
+                  <a href="/edit-post/<%= post._id %>" class="btn">Edit & Publish</a>
+          
+                  <form action="/delete-post/<%= post._id %>?_method=DELETE" method="POST">
+                    <input type="submit" value="Delete" class="btn-delete btn">
+                  </form>
+          
+                </div>
+          
+              </li>
+          
+            <% }) %>
+        </ul>
+       <% } %>
+    
+</section>

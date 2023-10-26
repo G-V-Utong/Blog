@@ -5,6 +5,7 @@ const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const session = require('express-session');
+const { countWords } = require('../helpers/countWords');
 
 const adminLayout = '../views/layouts/admin';
 const jwtSecret = process.env.JWT_SECRET;
@@ -16,7 +17,7 @@ const authMiddleware = (req, res, next) => {
   const token =  req.cookies.token;
 
   if(!token) {
-    return res.status(401).json({message: 'Not token'});
+    return res.status(401).json({message: 'No token'});
   }
 
   try {
@@ -50,9 +51,10 @@ router.get('/register', (req, res) => {
     try {
       const locals = {
         title: "Sign Up",
+        loggedInUser: true,
       }
   
-      res.render('admin/signup', { locals, layout: adminLayout });
+      res.render('admin/signup', { locals, layout: adminLayout, currentRoute: '/register' });
     } catch (error) {
       console.log(error);
     }
@@ -78,7 +80,7 @@ router.post('/admin', async (req, res) => {
       const token = jwt.sign( { userId: user._id}, jwtSecret );
       res.cookie( 'token', token, {httpOnly: true } );
 
-      res.redirect( '/admin/dashboard' );
+      res.redirect( '/admin/home' );
 
     //   res.render('admin/index', { locals, layout: adminLayout });
     } catch (error) {
@@ -86,17 +88,70 @@ router.post('/admin', async (req, res) => {
     }
 });
 
+// Get all posts
+router.get('/admin/home', async (req, res) => {
+    
+
+    try {
+        const locals = {
+            title: "Blog API",
+            description: "Blog API using Node.js"
+        }
+
+        // Pagination
+
+        let perPage = 20;
+        let page = req.query.page || 1;
+
+        const data = await Post.aggregate([ 
+            { $match: {state: 'published'}}, 
+        { $sort: { createdAt: -1 } } ])
+        .skip(perPage * page - perPage)
+        .limit(perPage)
+        .exec();
+
+        const count = await Post.count({ state: 'published' });
+        const nextPage = parseInt(page) + 1;
+        const prevPage = parseInt(page) - 1;
+        const hasNextPage = nextPage <= Math.ceil(count / perPage);
+        const hasPrevPage = prevPage <= Math.ceil(count / perPage);
+
+        res.render('admin/home', { 
+        locals,
+        data,
+        layout: adminLayout,
+        current: page,
+        nextPage: hasNextPage ? nextPage : null,
+        prevPage: hasPrevPage ? prevPage : null,
+        currentRoute: '/admin/home'
+        });
+    } catch (error) {
+        console.log(error);
+    } 
+});
+
+
 // GET - admin dashboard
 
 router.get('/admin/dashboard', authMiddleware, async (req, res) => {
   try {
     const locals = {
       title: "Dashboard",
-    }
-    const data = await Post.find();
+    };
+
+    const authorId = req.userId;
+    const user = await User.findOne({ _id: authorId });
+    const userFullName = `${user.first_name} ${user.last_name}`;
+
+    const data = await Post.find(
+      {
+        author: userFullName,
+      },
+    );
     res.render('admin/dashboard', {
       locals,
       data,
+      layout: adminLayout,
       currentRoute: '/admin/dashboard'
     });
   } catch (error) {
@@ -116,7 +171,8 @@ router.get('/add-post', authMiddleware, async (req, res) => {
     const data = await Post.find();
     res.render('admin/add-post', {
       locals,
-      layout: adminLayout
+      layout: adminLayout,
+      currentRoute: '/admin/add-post'
     });
 
   } catch (error) {
@@ -125,18 +181,47 @@ router.get('/add-post', authMiddleware, async (req, res) => {
 
 });
 
-// POST - Admin Create New Post
+// POST - Admin Create New Post - Draft
 
 router.post('/add-post', authMiddleware, async (req, res) => {
+  
+
   try {
     try {
-      const newPost = new Post({
-        title: req.body.title,
-        body: req.body.body
-      });
+      const readCount = (countWords(req.body.body)/200);
+      const authorId = req.body.author || req.userId;
+      const user = await User.findOne({ _id: authorId });
+      let author;
 
-      await Post.create(newPost);
-      res.redirect('/dashboard');
+      user ? author = `${user.first_name} ${user.last_name}` : author = req.body.author;
+      
+      const action = req.body.action; // Get the value of the "action" field in the 'add-post' form
+
+      if (action === 'draft') {
+        const newPost = new Post({
+          title: req.body.title,
+          description: req.body.description,
+          tags: req.body.tags,
+          author,
+          body: req.body.body,
+          reading_time: readCount,
+          state: 'draft'
+        });
+        await Post.create(newPost);
+      } else if (action === 'publish') {
+        const newPost = new Post({
+          title: req.body.title,
+          description: req.body.description,
+          tags: req.body.tags,
+          author,
+          body: req.body.body,
+          reading_time: readCount,
+          state: 'published',
+        });
+        await Post.create(newPost);
+      }
+      // await Post.create(newPost);
+      res.redirect('/admin/dashboard');
     } catch (error) {
       console.log(error);
     }
@@ -145,6 +230,36 @@ router.post('/add-post', authMiddleware, async (req, res) => {
     console.log(error);
   }
 });
+
+// // POST - Admin Publish Post
+
+// router.post('/publish-post', authMiddleware, async (req, res) => {
+//   try {
+//     const readCount = (countWords(req.body.body)/250);
+//       const authorId = req.body.author || req.userId;
+//       const user = await User.findOne({ _id: authorId });
+//       let author;
+
+//       user ? author = `${user.first_name} ${user.last_name}` : author = req.body.author;
+      
+//     // Set the state of the newPost object to 'published'
+    
+//     const newPost = new Post({
+//       title: req.body.title,
+//       description: req.body.description,
+//       tags: req.body.tags,
+//       author,
+//       body: req.body.body,
+//       reading_time: readCount,
+//       state: 'published' // Set the state to 'published'
+//     });
+
+//     await Post.create(newPost);
+//     res.redirect('/admin/dashboard');
+//   } catch (error) {
+//     console.log(error);
+//   }
+// });
 
 //GET - Admin edit post
 
@@ -174,20 +289,64 @@ router.get('/edit-post/:id', authMiddleware, async (req, res) => {
 
 router.put('/edit-post/:id', authMiddleware, async (req, res) => {
   try {
+    const readCount = countWords(req.body.body)/200;
+    const action = req.body.action; // Get the value of the "action" field in the 'add-post' form
 
-    await Post.findByIdAndUpdate(req.params.id, {
-      title: req.body.title,
-      body: req.body.body,
-      updatedAt: Date.now()
-    });
+    if (action === 'draft') {
+      await Post.findByIdAndUpdate(req.params.id, {
+        title: req.body.title,
+        body: req.body.body,
+        description: req.body.description,
+        tags: req.body.tags,
+        author: req.body.author,
+        reading_time: readCount,
+        updatedAt: Date.now(),
+        state: 'draft',
+      });
+    } else if (action === 'publish') {
+      await Post.findByIdAndUpdate(req.params.id, {
+        title: req.body.title,
+        body: req.body.body,
+        description: req.body.description,
+        tags: req.body.tags,
+        author: req.body.author,
+        reading_time: readCount,
+        updatedAt: Date.now(),
+        state: 'published',
 
-    res.redirect(`/dashboard`);
+      });
+    }
+    res.redirect(`/admin/dashboard`);
 
   } catch (error) {
     console.log(error);
   }
 
 });
+
+// PUT - Publish a post
+
+// router.put('/publish-post/:id', authMiddleware, async (req, res) => {
+//   try {
+//     const readCount = countWords(req.body.body)/200;
+//     await Post.findByIdAndUpdate(req.params.id, {
+//       title: req.body.title,
+//       body: req.body.body,
+//       description: req.body.description,
+//       tags: req.body.tags,
+//       author: req.body.author,
+//       reading_time: readCount,
+//       updatedAt: Date.now(),
+//       state: 'published',
+//     });
+
+//     res.redirect(`/admin/dashboard`);
+
+//   } catch (error) {
+//     console.log(error);
+//   }
+
+// });
 
 // POST - admin register
 
@@ -225,7 +384,7 @@ router.delete('/delete-post/:id', authMiddleware, async (req, res) => {
 
   try {
     await Post.deleteOne( { _id: req.params.id } );
-    res.redirect('/dashboard');
+    res.redirect('/admin/dashboard');
   } catch (error) {
     console.log(error);
   }
@@ -236,8 +395,107 @@ router.delete('/delete-post/:id', authMiddleware, async (req, res) => {
 
 router.get('/logout', (req, res) => {
   res.clearCookie('token');
+  res.locals.loggedInUser = false;
   //res.json({ message: 'Logout successful.'});
   res.redirect('/');
 });
   
+// POST search
+
+router.post('/search', async (req, res) => {
+  try {
+      const locals = {
+          title: 'Search',
+      }
+
+      let searchTerm = req.body.searchTerm || "";
+      const searchNoSpecialChar = searchTerm.replace(/[^a-zA-Z0-9 ]/g, "");
+      const data = await Post.find({
+          $or: [
+              { title: { $regex: searchNoSpecialChar, $options: "i"}},
+              { body: { $regex: searchNoSpecialChar, $options: "i"} },
+              { author: { $regex: searchNoSpecialChar, $options: "i"} },
+              { tags: { $regex: searchNoSpecialChar, $options: "i"} },
+              { description: { $regex: searchNoSpecialChar, $options: "i"} }
+          ]
+          });
+      
+      res.render('search', {
+          data,
+          locals,
+          currentRoute: '/search'
+      });
+  }catch(error) {
+      console.log(error);
+  }
+      
+});
+
+// GET - drafts page
+
+router.get('/admin/drafts', authMiddleware, async (req, res) => {
+  try {
+    const locals = {
+      title: "Drafts",
+    };
+
+    const authorId = req.userId;
+    const user = await User.findOne({ _id: authorId });
+    const userFullName = `${user.first_name} ${user.last_name}`
+    // Pagination
+
+    let perPage = 20;
+    let page = req.query.page || 1;
+
+    const data = await Post.find({
+      author: userFullName,
+      state: 'draft'
+    },
+    )
+   
+    
+    res.render('drafts', {
+      locals,
+      data,
+      layout: adminLayout,
+      currentRoute: '/admin/drafts',
+    });
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+// GET - published page
+router.get('/admin/published', authMiddleware, async (req, res) => {
+  try {
+    const locals = {
+      title: "Published Posts",
+    };
+
+    const authorId = req.userId;
+    const user = await User.findOne({ _id: authorId });
+    const userFullName = `${user.first_name} ${user.last_name}`
+
+    const data = await Post.find({
+      author: userFullName,
+      state: 'published'
+    },
+    //   [
+    //   {$match: {state: 'published'}},
+    //   { $sort: { createdAt: -1 } }
+    // ]
+    )
+    
+    res.render('published', {
+      locals,
+      data,
+      layout: adminLayout,
+      currentRoute: '/admin/published',
+    });
+  } catch (error) {
+    console.error(error);
+  }
+  
+});
+
 module.exports = router;

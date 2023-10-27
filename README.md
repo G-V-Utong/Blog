@@ -3,6 +3,8 @@
 
 Bloggo is a powerful blogging API that allows users to create, manage, and read blogs seamlessly. It is built using Node.js, Express, and MongoDB, providing a robust and efficient platform for bloggers and readers.
 ![Bloggo landing page](https://github.com/G-V-Utong/Bloggo-Blog-API/blob/main/public/images/Bloggo%20landing%20page.PNG)
+![articles](https://github.com/G-V-Utong/Bloggo-Blog-API/blob/main/public/images/Articles.PNG)
+![articles](https://github.com/G-V-Utong/Bloggo-Blog-API/blob/main/public/images/Bloggo%20Landing%20page-responsive.PNG)
 
 ## Table of Contents
 

@@ -19,7 +19,7 @@
                 </a>
                 <div class="admin-post-controls">
     
-                    <p><% if (post.createdAt === post.updatedAt) { %>
+                    <p><% if (post.createdAt.getTime() === post.updatedAt.getTime()) { %>
                         Published: <%= post.createdAt.toDateString() %>
                     <% } else { %>
                         Last edited: <%= post.updatedAt.toDateString() %>

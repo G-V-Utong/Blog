@@ -87,6 +87,7 @@ Bloggo uses JWT (JSON Web Token) for authentication. Tokens expire after 1 hour 
 
 ## Database Models
 ![ERD](https://github.com/G-V-Utong/Bloggo-Blog-API/blob/main/public/images/ERD.PNG)
+
 The Entity Relationship Diagram that defines the interactions and relationship between the models can be accessed her:
 https://drawsql.app/teams/godswill-utong/diagrams/bloggo-api-erd
 ### User

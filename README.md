@@ -17,6 +17,7 @@ Bloggo is a powerful blogging API that allows users to create, manage, and read 
 - Authentication
 - Database Models
 - Testing
+- Deployment
 - Contributing
 - License
 
@@ -114,6 +115,7 @@ https://drawsql.app/teams/godswill-utong/diagrams/bloggo-api-erd
 ## Testing
 To run tests for the Bloggo project, use the following command:
     npm test
-
+## Deployment
+Bloggo deployed URL can be accessed and interacted with via: https://bloggo-blog-api.onrender.com/
 ## License
 This project is licensed under the MIT License.

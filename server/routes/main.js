@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router(); 
 const Post = require('../models/post');
 require('./admin');
+const {logger} = require('./logger');
 
 const adminLayout = '../views/layouts/admin';
 
@@ -44,7 +45,7 @@ router.get('', async (req, res) => {
         currentRoute: '/'
         });
     } catch (error) {
-        console.log(error);
+        logger.postLogger.log('error', error)
     } 
 });
 
@@ -77,7 +78,7 @@ router.get('/post/:id',  async (req, res) => {
 
         res.render('post', {locals, data, layout: layout,  currentRoute: `/posts/${slug}`});
     }catch(error) {
-        console.log(error);
+        logger.postLogger.log('error', error)
     }
         
 });
@@ -116,7 +117,7 @@ router.post('/search', async (req, res) => {
             currentRoute: '/search'
         });
     }catch(error) {
-        console.log(error);
+        logger.postLogger.log('error', error)
     }
         
 });

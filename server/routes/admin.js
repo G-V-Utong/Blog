@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const session = require('express-session');
 const { countWords } = require('../helpers/countWords');
+const {logger} = require('./logger');
 
 const adminLayout = '../views/layouts/admin';
 const jwtSecret = process.env.JWT_SECRET;
@@ -17,7 +18,7 @@ const authMiddleware = (req, res, next) => {
   const token =  req.cookies.token;
 
   if(!token) {
-    return res.status(401).json({message: 'No token'});
+    return res.status(401).json({message: 'You are not signed in'});
   }
 
   try {
@@ -68,23 +69,26 @@ router.post('/admin', async (req, res) => {
 
       const user = await User.findOne({ username });
       if (!user) {
+        logger.userLogger.log('error', 'invalid user');
         return res.status(401).json({ message: 'Invalid username or password'})
       }
 
       const isPasswordValid = await bcrypt.compare( password, user.password );
 
       if (!isPasswordValid) {
+        logger.userLogger.log('error', 'invalid password');
         return res.status(401).json({ message: 'Invalid password' })
       }
 
       const token = jwt.sign( { userId: user._id}, jwtSecret );
       res.cookie( 'token', token, {httpOnly: true } );
-
       res.redirect( '/admin/home' );
-
+      logger.userLogger.log('info', 'login successful');
+      // return res.status(200).json({ message: 'Login successful' })
+      
     //   res.render('admin/index', { locals, layout: adminLayout });
     } catch (error) {
-      console.log(error);
+      logger.userLogger.log('error', 'login unsuccessful');
     }
 });
 
@@ -174,9 +178,9 @@ router.get('/add-post', authMiddleware, async (req, res) => {
       layout: adminLayout,
       currentRoute: '/admin/add-post'
     });
-
+    logger.postLogger.log('info', 'Post successfully created')
   } catch (error) {
-    console.log(error);
+    logger.postLogger.log('error', error)
   }
 
 });
@@ -208,6 +212,7 @@ router.post('/add-post', authMiddleware, async (req, res) => {
           state: 'draft'
         });
         await Post.create(newPost);
+        logger.postLogger.log('info', 'Post successfully saved to drafts')
       } else if (action === 'publish') {
         const newPost = new Post({
           title: req.body.title,
@@ -219,15 +224,16 @@ router.post('/add-post', authMiddleware, async (req, res) => {
           state: 'published',
         });
         await Post.create(newPost);
+        logger.postLogger.log('info', 'Post successfully published')
       }
       // await Post.create(newPost);
       res.redirect('/admin/dashboard');
     } catch (error) {
-      console.log(error);
+      logger.postLogger.log('error', error)
     }
 
   } catch (error) {
-    console.log(error);
+    logger.postLogger.log('error', error)
   }
 });
 
@@ -303,6 +309,7 @@ router.put('/edit-post/:id', authMiddleware, async (req, res) => {
         updatedAt: Date.now(),
         state: 'draft',
       });
+        logger.postLogger.log('info', 'Post successfully saved to drafts')
     } else if (action === 'publish') {
       await Post.findByIdAndUpdate(req.params.id, {
         title: req.body.title,
@@ -315,11 +322,12 @@ router.put('/edit-post/:id', authMiddleware, async (req, res) => {
         state: 'published',
 
       });
+        logger.postLogger.log('info', 'Post successfully published')
     }
     res.redirect(`/admin/dashboard`);
 
   } catch (error) {
-    console.log(error);
+    logger.postLogger.log('error', error)
   }
 
 });
@@ -374,7 +382,7 @@ router.post('/register', async (req, res) => {
 
 
     } catch (error) {
-      console.log(error);
+      logger.postLogger.log('error', error)
     }
 });
 

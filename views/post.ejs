@@ -8,7 +8,7 @@
            <%  } else if (Date.now() - data.createdAt < 3600000) {%> <p> <%= Math.round(((Date.now() - data.createdAt) / 60000)) %> min ago •</p>
                <% } else if (Date.now() - data.createdAt < 86400000) {%> <p> <%= Math.round(((Date.now() - data.createdAt) / 3600000)) %> hours ago •</p>
                 <% } else if (Date.now() - data.createdAt < 604800000) {%> <p> <%= Math.round(((Date.now() - data.createdAt) / 86400000)) %> days ago •</p>
-                   <% } else { %> <p><%= data.createdAt.toDateString %> •</p>
+                   <% } else { %> <p><%= data.createdAt.toDateString() %> •</p>
                        <% } %></p>
                        <i class="fa fa-eye"></i><p><%= data.read_count %></p> 
     </div>
